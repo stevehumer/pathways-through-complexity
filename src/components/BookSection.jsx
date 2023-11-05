@@ -16,7 +16,7 @@ export const BookSection = () => {
           </p>
           <span className="text-sm font-light">Buy the book:</span> {/* Smaller and lighter text */}
           <div className="flex justify-center">
-            <a href="#!" className="inline-flex items-center text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">
+            <a href="https://www.amazon.com/Pathways-Through-Complexity-Business-Choices/dp/B0CLVN6MBV" className="inline-flex items-center text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">
               <img src={amazonLogo} alt="Amazon" className="w-6 mr-2" />
               Amazon.com
             </a>
