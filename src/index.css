@@ -1,3 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS that isn't covered by Tailwind utilities */
+button {
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+
+.header-font {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/*
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -67,3 +84,4 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+*/
