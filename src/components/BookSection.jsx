@@ -7,7 +7,7 @@ export const BookSection = () => {
       <div className="container mx-auto flex px-5 py-2 items-center justify-center flex-col md:flex-row max-w-5xl"> {/* Constrain the maximum width */}
         <img src={bookCover} alt="Book Cover" className="object-cover object-center rounded w-4/5 md:w-1/4 mb-10 md:mb-0" /> {/* Image 20% smaller */}
         <div className="lg:flex-grow md:w-4/5 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
-        <h2 className="text-3xl mb-4 text-gray-900">Book Overview</h2>
+        <h2 className="text-3xl mb-4 text-gray-900">About the Book</h2>
           <p className="leading-relaxed mb-6">
           Why is the business so complex? In <span className="font-bold italic">Pathways Through Complexity</span>, the author investigates many of the attributes of the business world and 
           offers his insights and observations to understanding and interpreting the factors and forces that affect corporate behaviors that affect 
