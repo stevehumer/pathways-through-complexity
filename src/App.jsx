@@ -4,6 +4,9 @@ import { BookSection } from './components/BookSection';
 import { VideoSection } from './components/VideoSection';
 import { ContactForm } from './components/ContactSection';
 import { Footer } from './components/Footer';
+import { ReactGA } from "react-ga4";
+
+ReactGA.initialize('G-4EMQ08D9PM');
 
 const App = () => {
   return (
