@@ -74,15 +74,15 @@ export const BookSection = () => {
                 <h2 className="text-3xl mb-6 text-gray-900 text-center">Bine Ari Digit (BAD) Adventures</h2>
                 <div className="flex flex-col md:flex-row justify-between">
                     {[
-                        { title: "Challenges at Azelica", img: azelicaBookCover, link: "https://www.amazon.com/Challenges-Azelica-BAD-Adventures-Fable-ebook/dp/B0CP2QHQYC", description: 
+                        { title: "Book 1: Challenges at Azelica", img: azelicaBookCover, link: "https://www.amazon.com/Challenges-Azelica-BAD-Adventures-Fable-ebook/dp/B0CP2QHQYC", description: 
                             "We first encounter Ari as a middle manager working in an operations staff role for Azelica Technologies, a large & diversified B28 firm. He is tasked with finding effective solutions to a variety of operations challenges."
                             //"Bine Ari Digit navigates the complexities of a B2B corporation, facing challenges that test his growth, leadership, and problem-solving skills as he helps drive success."
                         },
-                        { title: "Solutions for Sunblast", img: sunblastBookCover, link: "https://www.amazon.com/Challenges-Azelica-BAD-Adventures-Fable-ebook/dp/B0CP2QHQYC", description:
+                        { title: "Book 2: Solutions for Sunblast", img: sunblastBookCover, link: "https://www.amazon.com/Challenges-Azelica-BAD-Adventures-Fable-ebook/dp/B0CP2QHQYC", description:
                             "Radical career changes can lead to satisfying outcomes. Ari has joined Mountain Vista, a boutique consulting company. His initial client, Sunblast Innovations, will test his skills and abilities in helping them find success."
                             //"Now a consultant at Mountain Vista, Ari’s first project takes him to Sunblast Innovations, where he must steer the company through strategic and operational challenges."
                         },
-                        { title: "School Days", img: schooldaysBookCover, link: "https://www.amazon.com/School-Days-Adventures-Fable-Digit-ebook/dp/B0DQ1V8P5V", description:
+                        { title: "Book 3: School Days", img: schooldaysBookCover, link: "https://www.amazon.com/School-Days-Adventures-Fable-Digit-ebook/dp/B0DQ1V8P5V", description:
                             "Ari has fond remembrances of his college days. However, being a student has not prepared him for how significantly strategic changes will impact Belmontica College, his next consulting assignment."
                             //"Ari’s next challenge leads him to Belmontica College, where he works with faculty and staff to enhance academic effectiveness while tackling unexpected institutional crises."
                         }
