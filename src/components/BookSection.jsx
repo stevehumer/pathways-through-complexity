@@ -1,10 +1,9 @@
 import bookCover from '../assets/ptc-cover.jpg';
-import azelicaBookCover from '../assets/azelica-cover.jpg';
+import azelicaBookCover from '../assets/azelica-cover.png';
 import sunblastBookCover from '../assets/sunblast-cover.jpg';
 import schooldaysBookCover from '../assets/schooldays-cover.jpg';
 import exploitsBookCover from '../assets/exploits-cover.jpg';
 import amazonLogo from '../assets/amzn-logo.svg';
-import googleLogo from '../assets/google-logo.png';
 import ReactGA from "react-ga4";
   
 export const BookSection = () => {
@@ -31,21 +30,6 @@ export const BookSection = () => {
             category: "Outbound Link",
             action: "click",
             label: "Kindle",
-        });
-        
-        setTimeout(() => {
-            window.location.href = href;
-        }, 150);
-    };
-
-    const handleOutboundAzelicaLinkClick = (event) => {
-        event.preventDefault();
-        const href = event.currentTarget.href;
-        
-        ReactGA.event({
-            category: "Outbound Link",
-            action: "click",
-            label: "Azelica Kindle",
         });
         
         setTimeout(() => {
