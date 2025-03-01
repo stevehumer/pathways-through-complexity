@@ -39,6 +39,8 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
+      - name: Debug: List build files
+        run: ls -la dist
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
@@ -47,4 +49,4 @@ jobs:
           path: 'dist'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
