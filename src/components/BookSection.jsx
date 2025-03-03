@@ -84,10 +84,10 @@ export const BookSection = () => {
                             //"Ari’s next challenge leads him to Belmontica College, where he works with faculty and staff to enhance academic effectiveness while tackling unexpected institutional crises."
                         }
                         ].map((book, index) => (
-                        <div key={index} className="w-full md:w-1/3 flex flex-col items-center px-4">
+                            <div key={index} className="w-full md:w-1/3 flex flex-col items-center px-4 mb-8 md:mb-0">
                             <img src={book.img} alt={book.title} className="w-48 h-72 object-cover object-center rounded mb-4 shadow-md" />
                             <h3 className="text-xl text-gray-900">{book.title}</h3>
-                            <p className="text-sm text-gray-700 text-center mb-6 md:mb-2">
+                            <p className="text-sm text-gray-700 text-center">
                                 {book.description}
                             </p>
                             <a href={book.link} 
