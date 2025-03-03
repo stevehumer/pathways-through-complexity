@@ -45,10 +45,7 @@ export const BookSection = () => {
                 <div className="lg:flex-grow md:w-4/5 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
                     <h2 className="text-3xl mb-4 text-gray-900">Pathways Through Complexity</h2>
                     <p className="leading-relaxed mb-6">
-                    Why is the business so complex? In <span className="font-bold italic">Pathways Through Complexity</span>, the author investigates many of the attributes of the business world and 
-                    offers his insights and observations to understanding and interpreting the factors and forces that affect corporate behaviors that affect 
-                    owners, employees, customers, and stakeholders. A fictional novella is included, describing how life in a major corporation is experienced 
-                    by a middle manager who finds ways to assist the company in their pursuit of success.
+                    Why is business so complex? In Pathways Through Complexity, the author offers his approach to understanding and interpreting the many attributes of the business world, and discusses the factors and forces affecting owners, employees, customers, and stakeholders. Also included is a fictional novella, The Challenges at Azelica, which shares the experiences of a middle manager in a large corporation and how he assists the company in its pursuit of success.
                     </p>
                     <span className="text-sm font-light">Buying options:</span> {/* Smaller and lighter text */}
                     <div className="flex justify-center items-center">
@@ -90,7 +87,7 @@ export const BookSection = () => {
                         <div key={index} className="w-full md:w-1/3 flex flex-col items-center px-4">
                             <img src={book.img} alt={book.title} className="w-48 h-72 object-cover object-center rounded mb-4 shadow-md" />
                             <h3 className="text-xl text-gray-900">{book.title}</h3>
-                            <p className="text-sm text-gray-700 text-center">
+                            <p className="text-sm text-gray-700 text-center mb-6 md:mb-2">
                                 {book.description}
                             </p>
                             <a href={book.link} 
