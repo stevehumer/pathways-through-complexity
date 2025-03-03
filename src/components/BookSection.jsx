@@ -1,6 +1,6 @@
 import bookCover from '../assets/ptc-cover.jpg';
 import azelicaBookCover from '../assets/azelica-cover.png';
-import sunblastBookCover from '../assets/sunblast-cover.jpg';
+import sunblastBookCover from '../assets/sunblast-cover.png';
 import schooldaysBookCover from '../assets/schooldays-cover.jpg';
 import exploitsBookCover from '../assets/exploits-cover.jpg';
 import amazonLogo from '../assets/amzn-logo.svg';
