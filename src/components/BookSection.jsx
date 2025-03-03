@@ -85,7 +85,11 @@ export const BookSection = () => {
                         }
                         ].map((book, index) => (
                             <div key={index} className="w-full md:w-1/3 flex flex-col items-center px-4 mb-8 last:mb-0 md:mb-0">
-                            <img src={book.img} alt={book.title} className="w-48 h-72 object-cover object-center rounded mb-4 shadow-md" />
+                            <img 
+                                src={book.img} 
+                                alt={book.title} 
+                                className="h-72 w-auto max-w-full object-contain rounded mb-4 shadow-md" 
+                            />
                             <h3 className="text-xl text-gray-900">{book.title}</h3>
                             <p className="text-sm text-gray-700 text-center">
                                 {book.description}
