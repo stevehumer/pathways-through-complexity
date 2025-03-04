@@ -1,7 +1,7 @@
 import bookCover from '../assets/ptc-cover.jpg';
 import azelicaBookCover from '../assets/azelica-cover.png';
 import sunblastBookCover from '../assets/sunblast-cover.png';
-import schooldaysBookCover from '../assets/schooldays-cover.jpg';
+import belmonticaBookCover from '../assets/belmontica-cover.png';
 import exploitsBookCover from '../assets/exploits-cover.jpg';
 import amazonLogo from '../assets/amzn-logo.svg';
 import ReactGA from "react-ga4";
@@ -79,7 +79,7 @@ export const BookSection = () => {
                             "Radical career changes can lead to satisfying outcomes. Ari has joined Mountain Vista, a boutique consulting company. His initial client, Sunblast Innovations, will test his skills and abilities in helping them find success."
                             //"Now a consultant at Mountain Vista, Ari’s first project takes him to Sunblast Innovations, where he must steer the company through strategic and operational challenges."
                         },
-                        { title: "Book 3: School Days", img: schooldaysBookCover, link: "https://www.amazon.com/School-Days-Adventures-Fable-Digit-ebook/dp/B0DQ1V8P5V", description:
+                        { title: "Book 3: School Days", img: belmonticaBookCover, link: "https://www.amazon.com/School-Days-Adventures-Fable-Digit-ebook/dp/B0DQ1V8P5V", description:
                             "Ari has fond remembrances of his college days. However, being a student has not prepared him for how significantly strategic changes will impact Belmontica College, his next consulting assignment."
                             //"Ari’s next challenge leads him to Belmontica College, where he works with faculty and staff to enhance academic effectiveness while tackling unexpected institutional crises."
                         }
