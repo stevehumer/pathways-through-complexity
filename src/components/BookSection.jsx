@@ -72,7 +72,7 @@ export const BookSection = () => {
                 <div className="flex flex-col md:flex-row justify-between">
                     {[
                         { title: "Book 1: Challenges at Azelica", img: azelicaBookCover, link: "https://www.amazon.com/Challenges-Azelica-BAD-Adventures-Fable-ebook/dp/B0CP2QHQYC", description: 
-                            "We first encounter Ari as a middle manager working in an operations staff role for Azelica Technologies, a large & diversified B28 firm. He is tasked with finding effective solutions to a variety of operations challenges."
+                            "We first encounter Ari as a middle manager working in an operations staff role for Azelica Technologies, a large & diversified B2B firm. He is tasked with finding effective solutions to a variety of operations challenges."
                             //"Bine Ari Digit navigates the complexities of a B2B corporation, facing challenges that test his growth, leadership, and problem-solving skills as he helps drive success."
                         },
                         { title: "Book 2: Solutions for Sunblast", img: sunblastBookCover, link: "https://www.amazon.com/Challenges-Azelica-BAD-Adventures-Fable-ebook/dp/B0CP2QHQYC", description:
