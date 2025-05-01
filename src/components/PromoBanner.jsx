@@ -22,7 +22,7 @@ export const PromoBanner = () => {
 
   return (
     <div className="bg-blue-100 text-blue-900 text-center py-3 px-4 shadow-md mt-14 md:mt-16">
-      📚 <strong>Free eBook!</strong> Download <em>“Challenges at Azelica”</em> for free from <strong>May 1-5, 2025</strong>. First in the <em>Bine Ari Digit</em> series! 👉{" "}
+      📚 <strong>Free eBook!</strong> Download <em>“The Challenges at Azelica”</em> for free from <strong>May 1-5, 2025</strong>. First in the <em>Bine Ari Digit</em> fiction series! 👉{" "}
       <a
         href="https://www.amazon.com/Challenges-Azelica-BAD-Adventures-Fable-ebook/dp/B0CP2QHQYC"
         onClick={handleFreeEbookClick}
