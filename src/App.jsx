@@ -1,5 +1,6 @@
 import React from 'react';
 import { Header } from './components/Header';
+import { PromoBanner } from './components/PromoBanner';
 import { BookSection } from './components/BookSection';
 import { VideoSection } from './components/VideoSection';
 import { ContactForm } from './components/ContactSection';
@@ -15,6 +16,8 @@ const App = () => {
   return (
     <>
       <Header />
+      <div className="h-14 md:h-8" /> {/* Spacer equal to header height */}
+      <PromoBanner />
       <BookSection />
       <div className="container mx-auto flex justify-center">
         <hr className="border-gray-200 w-3/5 my-8" />
