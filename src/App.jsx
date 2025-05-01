@@ -16,7 +16,7 @@ const App = () => {
   return (
     <>
       <Header />
-      <div className="h-6 md:h-8" /> {/* Spacer equal to header height */}
+      <div className="h-8 md:h-8" /> {/* Spacer equal to header height */}
       <PromoBanner />
       <BookSection />
       <div className="container mx-auto flex justify-center">
