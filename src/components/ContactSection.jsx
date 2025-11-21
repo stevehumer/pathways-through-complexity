@@ -1,4 +1,4 @@
-import React from 'react';
+// React import not required with the current JSX transform; keep file free of unused imports
 import { useForm, ValidationError } from '@formspree/react';
 import ariImage from '../assets/ari.png';
 
