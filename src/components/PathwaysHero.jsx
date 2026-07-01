@@ -32,12 +32,12 @@ export const PathwaysHero = () => {
                     </p>
                     <span className="text-sm font-light text-ink/60">Buying options:</span> {/* Smaller and lighter text */}
                     <div className="flex justify-center items-center">
-                        <a href="https://www.amazon.com/Pathways-Through-Complexity-Business-Choices/dp/B0CLVN6MBV" className={buyButtonClasses} onClick={handleOutboundPaperbackLinkClick}>
+                        <a href="https://www.amazon.com/Pathways-Through-Complexity-Business-Choices/dp/B0CLVN6MBV" target="_blank" rel="noopener noreferrer" className={buyButtonClasses} onClick={handleOutboundPaperbackLinkClick}>
                             <img src={amazonLogo} alt="Amazon" className="w-4 mr-2" />
                             Buy Paperback
                         </a>
                         <div className="mx-2 h-5 border-l border-ink/20"></div> {/* Custom divider */}
-                        <a href="https://www.amazon.com/Pathways-Through-Complexity-Business-Choices-ebook/dp/B0CM7942YC" className={buyButtonClasses} onClick={handleOutboundKindleLinkClick}>
+                        <a href="https://www.amazon.com/Pathways-Through-Complexity-Business-Choices-ebook/dp/B0CM7942YC" target="_blank" rel="noopener noreferrer" className={buyButtonClasses} onClick={handleOutboundKindleLinkClick}>
                             <img src={amazonLogo} alt="Amazon" className="w-4 mr-2" />
                             Buy Kindle
                         </a>

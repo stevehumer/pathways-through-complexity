@@ -90,7 +90,7 @@ export const AskAriChat = () => {
         <div
           className={`fixed z-50 bg-paper rounded-lg shadow-2xl border border-ink/10 flex flex-col overflow-hidden transition-all duration-300 ${
             isExpanded
-              ? 'bottom-6 right-6 w-[90vw] max-w-2xl h-[85vh] max-h-[85vh]'
+              ? 'bottom-24 right-6 w-[90vw] max-w-2xl h-[75vh] max-h-[75vh]'
               : 'bottom-24 right-6 w-[90vw] max-w-sm h-[28rem] max-h-[70vh]'
           }`}
         >

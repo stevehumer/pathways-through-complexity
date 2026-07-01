@@ -32,7 +32,7 @@ export const TrilogySection = () => {
                     Sunblast, and School Days, collected in a single paperback volume.
                 </p>
                 <div className="flex justify-center items-center">
-                    <a href="https://www.amazon.com/Exploits-Bine-Ari-Digit/dp/B0DVCBK677/ref=sr_1_1?crid=1WUTO4E955UJW" className={buyButtonClasses} onClick={handleOutboundPaperbackLinkClick}>
+                    <a href="https://www.amazon.com/Exploits-Bine-Ari-Digit/dp/B0DVCBK677/ref=sr_1_1?crid=1WUTO4E955UJW" target="_blank" rel="noopener noreferrer" className={buyButtonClasses} onClick={handleOutboundPaperbackLinkClick}>
                         <img src={amazonLogo} alt="Amazon" className="w-4 mr-2" />
                         Buy Paperback
                     </a>

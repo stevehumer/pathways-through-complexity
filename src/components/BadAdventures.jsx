@@ -49,7 +49,7 @@ export const BadAdventures = () => {
                                     {book.description}
                                 </p>
                             </div>
-                            <a href={book.link}
+                            <a href={book.link} target="_blank" rel="noopener noreferrer"
                             className={`mt-4 ${buyButtonClasses}`}>
                                 <img src={amazonLogo} alt="Amazon" className="w-4 mr-2" />
                                 Buy Kindle
