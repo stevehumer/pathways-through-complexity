@@ -90,3 +90,8 @@ vite.config.ts
 
 # Storybook
 storybook-static/
+
+# Raw book manuscripts (PDFs) — this repo is public; the source manuscripts
+# stay local-only. Only condensed, non-verbatim summaries (worker/content-notes/)
+# are committed.
+/books/

@@ -3,8 +3,11 @@ import { Header } from './components/Header';
 // PromoBanner is temporarily disabled for post-sale. To re-enable, uncomment the
 // import below and the <PromoBanner /> element in the JSX return.
 // import { PromoBanner } from './components/PromoBanner';
-import { BookSection } from './components/BookSection';
+import { PathwaysHero } from './components/PathwaysHero';
 import { VideoSection } from './components/VideoSection';
+import { BadAdventures } from './components/BadAdventures';
+import { TrilogySection } from './components/TrilogySection';
+import { AskAriChat } from './components/AskAriChat';
 import { ContactForm } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import ReactGA from "react-ga4";
@@ -18,27 +21,17 @@ const App = () => {
   return (
     <>
       <Header />
-    <div className="h-8 md:h-8" /> {/* Spacer equal to header height */}
-    {/* PromoBanner temporarily disabled (Nov 14-18 sale). To re-enable:
-      1) Uncomment the import at the top of this file.
-      2) Replace the invisible spacer below with <PromoBanner /> to render it again.
-    */}
-    {/* Invisible spacer to preserve the banner's layout space so page spacing doesn't jump when the banner is hidden.
-        It keeps the same classes as the banner but is hidden (occupies space but not visible). */}
-    <div
-      className="invisible bg-blue-100 text-center py-2 px-4 shadow-md mt-8 md:mt-10"
-      aria-hidden="true"
-    />
-      <BookSection />
-      <div className="container mx-auto flex justify-center">
-        <hr className="border-gray-200 w-3/5 my-8" />
-      </div>
+    <div className="h-16 md:h-20" /> {/* Spacer equal to header height */}
+    {/* PromoBanner is disabled. To re-enable for a sale: uncomment the import
+        at the top of this file and add <PromoBanner /> right here — it renders
+        its own space, no separate spacer needed. */}
+      <PathwaysHero />
       <VideoSection />
-      <div className="container mx-auto flex justify-center">
-        <hr className="border-gray-200 w-3/5 my-8" />
-      </div>
+      <BadAdventures />
+      <TrilogySection />
       <ContactForm />
       <Footer />
+      <AskAriChat />
     </>
   );
 }

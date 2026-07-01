@@ -1,0 +1,19 @@
+{
+  "name": "ask-ari-worker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.109.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260630.1",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.106.0"
+  }
+}
