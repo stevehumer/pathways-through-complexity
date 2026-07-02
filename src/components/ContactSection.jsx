@@ -1,21 +1,17 @@
 // React import not required with the current JSX transform; keep file free of unused imports
 import { useForm, ValidationError } from '@formspree/react';
-import { useInView } from '../hooks/useInView';
+import { FadeInSection } from './FadeInSection';
 
 const inputClasses =
   "w-full bg-white rounded border border-ink/15 focus:border-gold focus:ring-2 focus:ring-gold/30 text-base outline-none text-ink py-1 px-3 leading-8 transition-colors duration-200 ease-in-out";
 
-export const ContactForm = () => {
+export const ContactSection = () => {
   const [state, handleSubmit] = useForm("mrgwdlab"); // Your Formspree form ID
-  const [ref, isInView] = useInView();
 
   return (
-    <section
-      ref={ref}
+    <FadeInSection
       id="contact"
-      className={`bg-paper scroll-mt-16 md:scroll-mt-20 pt-20 md:pt-24 pb-10 md:pb-12 relative transition-all duration-700 ease-out ${
-        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-      }`}
+      className="bg-paper scroll-mt-16 md:scroll-mt-20 pt-20 md:pt-24 pb-10 md:pb-12 relative"
     >
       <div className="container mx-auto flex px-5 items-center justify-center max-w-2xl">
         <div className="w-full bg-white/60 rounded-xl shadow-sm border border-ink/10 p-8 md:p-10 flex flex-col justify-center">
@@ -92,6 +88,6 @@ export const ContactForm = () => {
           )}
         </div>
       </div>
-    </section>
+    </FadeInSection>
   );
 };

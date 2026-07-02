@@ -8,7 +8,7 @@ import { VideoSection } from './components/VideoSection';
 import { BadAdventures } from './components/BadAdventures';
 import { TrilogySection } from './components/TrilogySection';
 import { AskAriChat } from './components/AskAriChat';
-import { ContactForm } from './components/ContactSection';
+import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import ReactGA from "react-ga4";
 import { useEffect } from 'react';
@@ -29,7 +29,7 @@ const App = () => {
       <VideoSection />
       <BadAdventures />
       <TrilogySection />
-      <ContactForm />
+      <ContactSection />
       <Footer />
       <AskAriChat />
     </>

@@ -1,4 +1,3 @@
-// components/PromoBanner.tsx
 import ReactGA from "react-ga4";
 
 export const PromoBanner = () => {

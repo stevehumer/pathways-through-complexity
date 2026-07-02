@@ -1,11 +1,9 @@
 import azelicaBookCover from '../assets/azelica-cover.jpg';
 import sunblastBookCover from '../assets/sunblast-cover.jpg';
 import belmonticaBookCover from '../assets/belmontica-cover.jpg';
-import amazonLogo from '../assets/amzn-logo.svg';
-import { useInView } from '../hooks/useInView';
-import { createOutboundLinkHandler } from '../utils/outboundLinkTracking';
-import { buyButtonClasses } from '../styles/buttons';
+import { BuyButton } from './BuyButton';
 import { ClickableImage } from './ClickableImage';
+import { FadeInSection } from './FadeInSection';
 
 const BOOKS = [
     { label: "Book 1", title: "The Challenges at Azelica", img: azelicaBookCover, link: "https://www.amazon.com/Challenges-Azelica-BAD-Adventures-Fable-ebook/dp/B0CP2QHQYC", description:
@@ -23,16 +21,8 @@ const BOOKS = [
 ];
 
 export const BadAdventures = () => {
-    const [ref, isInView] = useInView();
-
     return (
-        <section
-            ref={ref}
-            id="novels"
-            className={`bg-paper scroll-mt-16 md:scroll-mt-20 py-20 md:py-24 transition-all duration-700 ease-out ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
-        >
+        <FadeInSection id="novels" className="bg-paper scroll-mt-16 md:scroll-mt-20 py-20 md:py-24">
             <div className="container mx-auto px-5 max-w-5xl">
                 <h2 className="font-display text-3xl md:text-4xl mb-6 text-ink text-center">Bine Ari Digit (BAD) Adventures</h2>
                 <div className="flex flex-col md:flex-row gap-6 justify-center">
@@ -51,16 +41,13 @@ export const BadAdventures = () => {
                                     {book.description}
                                 </p>
                             </div>
-                            <a href={book.link} target="_blank" rel="noopener noreferrer"
-                            onClick={createOutboundLinkHandler(`Kindle: ${book.title}`)}
-                            className={`mt-4 ${buyButtonClasses}`}>
-                                <img src={amazonLogo} alt="Amazon" className="w-4 mr-2" />
+                            <BuyButton href={book.link} trackingLabel={`Kindle: ${book.title}`} className="mt-4">
                                 Buy Kindle
-                            </a>
+                            </BuyButton>
                         </div>
                     ))}
                 </div>
             </div>
-        </section>
+        </FadeInSection>
     );
 };
