@@ -14,7 +14,8 @@ export const PathwaysHero = () => {
     return (
         <section
             ref={ref}
-            className={`bg-paper pt-10 md:pt-12 pb-20 md:pb-24 transition-all duration-700 ease-out ${
+            id="pathways"
+            className={`bg-paper scroll-mt-16 md:scroll-mt-20 pt-10 md:pt-12 pb-20 md:pb-24 transition-all duration-700 ease-out ${
                 isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
         >
@@ -26,7 +27,8 @@ export const PathwaysHero = () => {
                     imgClassName="object-cover object-center w-full h-full"
                 />
                 <div className="lg:flex-grow md:w-4/5 lg:pl-24 md:pl-16 flex flex-col md:items-start md:text-left items-center text-center">
-                    <h2 className="font-display text-3xl md:text-4xl mb-4 text-ink">Pathways Through Complexity</h2>
+                    {/* The page's single h1: this hero is the site's headline content */}
+                    <h1 className="font-display text-3xl md:text-4xl mb-4 text-ink">Pathways Through Complexity</h1>
                     <p className="leading-relaxed mb-6 text-ink/80">
                     Why is business so complex? In Pathways Through Complexity, the author offers his approach to understanding and interpreting the many attributes of the business world, and discusses the factors and forces affecting owners, employees, customers, and stakeholders. Also included is a fictional novella, The Challenges at Azelica, which shares the experiences of a middle manager in a large corporation and how he assists the company in its pursuit of success.
                     </p>

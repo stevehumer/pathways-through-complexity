@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactGA from 'react-ga4';
 import ariImage from '../assets/ari.png';
 
 const WORKER_URL = import.meta.env.VITE_ASK_ARI_WORKER_URL;
@@ -81,6 +82,8 @@ export const AskAriChat = () => {
     setMessages((prev) => [...prev, { role: 'user', text: question }]);
     setInput('');
     setIsLoading(true);
+    // Counts only, never message content
+    ReactGA.event({ category: 'Ask Ari', action: 'message_sent' });
 
     let reply;
     try {
@@ -111,7 +114,13 @@ export const AskAriChat = () => {
   return (
     <>
       <button
-        onClick={() => setIsOpen((open) => !open)}
+        onClick={() => {
+          if (!isOpen) {
+            // Counts only, never message content
+            ReactGA.event({ category: 'Ask Ari', action: 'open' });
+          }
+          setIsOpen((open) => !open);
+        }}
         aria-label={isOpen ? 'Close chat with Ari' : 'Chat with Ari'}
         className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-bookYellow text-ink rounded-full shadow-lg pl-2.5 pr-5 py-2.5 hover:brightness-95 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 transition ${
           isOpen ? '' : 'animate-ari-nudge'

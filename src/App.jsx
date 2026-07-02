@@ -21,7 +21,7 @@ const App = () => {
   return (
     <>
       <Header />
-    <div className="h-16 md:h-20" /> {/* Spacer equal to header height */}
+    <div id="top" className="h-16 md:h-20" /> {/* Spacer equal to header height; #top anchors the wordmark's back-to-top link */}
     {/* PromoBanner is disabled. To re-enable for a sale: uncomment the import
         at the top of this file and add <PromoBanner /> right here — it renders
         its own space, no separate spacer needed. */}

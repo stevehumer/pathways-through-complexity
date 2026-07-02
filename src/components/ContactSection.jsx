@@ -12,7 +12,8 @@ export const ContactForm = () => {
   return (
     <section
       ref={ref}
-      className={`bg-paper pt-20 md:pt-24 pb-10 md:pb-12 relative transition-all duration-700 ease-out ${
+      id="contact"
+      className={`bg-paper scroll-mt-16 md:scroll-mt-20 pt-20 md:pt-24 pb-10 md:pb-12 relative transition-all duration-700 ease-out ${
         isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       }`}
     >
@@ -40,6 +41,8 @@ export const ContactForm = () => {
                     type="text"
                     id="name"
                     name="name"
+                    required
+                    autoComplete="name"
                     className={inputClasses}
                     />
                 </div>
@@ -51,6 +54,8 @@ export const ContactForm = () => {
                     type="email"
                     id="email"
                     name="email"
+                    required
+                    autoComplete="email"
                     className={inputClasses}
                     />
                     <ValidationError
@@ -67,6 +72,7 @@ export const ContactForm = () => {
                 <textarea
                   id="message"
                   name="message"
+                  required
                   className={`${inputClasses} h-32 resize-none leading-6`}
                 ></textarea>
                 <ValidationError

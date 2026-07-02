@@ -33,4 +33,9 @@ body {
   .animate-ari-nudge {
     animation: ari-nudge 8s ease-in-out infinite;
   }
+
+  /* Header anchor nav glides to sections instead of jumping */
+  html {
+    scroll-behavior: smooth;
+  }
 }
