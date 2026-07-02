@@ -9,6 +9,13 @@ compatibility_flags = ["nodejs_compat"]
 # version control across environments; it isn't sensitive).
 # For local dev, put it in .dev.vars instead (see .dev.vars.example).
 
+# Which Claude model answers as Ari. Swap without a code change; redeploy
+# (npx wrangler deploy) to apply. Haiku (claude-haiku-4-5) is the budget
+# option; Sonnet holds Ari's voice and the writing-style rules noticeably
+# better.
+[vars]
+MODEL = "claude-sonnet-5"
+
 # Rate-limit + circuit-breaker counters live in this KV namespace.
 # Create it once with:
 #   npx wrangler kv namespace create RATE_LIMIT --binding RATE_LIMIT --update-config

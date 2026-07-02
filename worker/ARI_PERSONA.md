@@ -82,11 +82,25 @@ whole knowledge base every time.
 
 ## Model & response settings (`src/index.ts`)
 
-- Model: `claude-haiku-4-5`
+- Model: `claude-sonnet-5`, set via the `MODEL` var in `wrangler.toml`
+  (falls back to the same default in code). Upgraded from
+  `claude-haiku-4-5` because Sonnet holds Ari's voice and the
+  writing-style rules (especially the no-em-dash rule) noticeably better;
+  to trade quality for cost, set `MODEL = "claude-haiku-4-5"` and redeploy.
 - `max_tokens`: 600 (raised from an initial 300 → 400 → 600 after live
   testing showed answers occasionally running long enough to get cut off
   mid-sentence; the guardrails already push for succinctness, this is a
   safety margin against abrupt cutoffs, not an invitation to ramble)
+
+## Conversation memory
+
+The chat is multi-turn: the frontend replays up to the last 12 messages
+as `history` alongside each new question, so Ari can answer follow-ups
+("tell me more about that") in context. The worker treats history as
+untrusted input — it drops malformed entries, caps each at 2,400 chars
+and 12 messages total, and normalizes the roles into a strictly
+alternating user/assistant transcript before calling the API. Worst-case
+that adds ~8K input tokens on top of the cached system prompt.
 
 ## How to extend this later
 

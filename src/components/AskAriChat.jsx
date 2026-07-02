@@ -8,6 +8,12 @@ const STARTER_MESSAGE = {
   text: "Hi, I'm Ari! Ask me anything about the books — the characters, the plots, or what I learned along the way.",
 };
 
+// Recent turns replayed to the worker so Ari remembers the conversation.
+// The worker enforces its own cap; this just keeps the payload small.
+const HISTORY_MESSAGES_SENT = 12;
+
+const FALLBACK_REPLY = "Ari's taking a quick break — please try again in a bit!";
+
 const TypingIndicator = () => (
   <div className="flex justify-start">
     <div className="flex items-center gap-1 rounded-lg px-3 py-3 bg-bookYellow">
@@ -37,6 +43,7 @@ export const AskAriChat = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -44,33 +51,61 @@ export const AskAriChat = () => {
     }
   }, [messages, isOpen, isLoading]);
 
+  useEffect(() => {
+    if (isOpen && !isLoading) {
+      inputRef.current?.focus();
+    }
+  }, [isOpen, isLoading]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const question = input.trim();
     if (!question || isLoading) return;
 
+    // Replay the conversation so far (minus the hardcoded greeting) so Ari
+    // can answer follow-ups in context. The worker validates and caps this.
+    const history = messages
+      .slice(1)
+      .slice(-HISTORY_MESSAGES_SENT)
+      .map(({ role, text }) => ({ role, text }));
+
     setMessages((prev) => [...prev, { role: 'user', text: question }]);
     setInput('');
     setIsLoading(true);
 
+    let reply;
     try {
       const res = await fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: question }),
+        body: JSON.stringify({ message: question, history }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Something went wrong');
+      if (res.ok && typeof data?.reply === 'string') {
+        reply = data.reply;
+      } else if (typeof data?.error === 'string') {
+        // Worker error messages (rate limits etc.) are already written in
+        // Ari's voice; anything unexpected gets the generic fallback.
+        reply = data.error;
+      } else {
+        reply = FALLBACK_REPLY;
       }
-      setMessages((prev) => [...prev, { role: 'ari', text: data.reply }]);
-    } catch (err) {
-      const fallback = "Ari's taking a quick break — please try again in a bit!";
-      setMessages((prev) => [...prev, { role: 'ari', text: err.message || fallback }]);
-    } finally {
-      setIsLoading(false);
+    } catch {
+      reply = FALLBACK_REPLY;
     }
+
+    setMessages((prev) => [...prev, { role: 'ari', text: reply }]);
+    setIsLoading(false);
   };
 
   return (
@@ -88,6 +123,8 @@ export const AskAriChat = () => {
 
       {isOpen && (
         <div
+          role="dialog"
+          aria-label="Chat with Ari"
           className={`fixed z-50 bg-paper rounded-lg shadow-2xl border border-ink/10 flex flex-col overflow-hidden transition-all duration-300 ${
             isExpanded
               ? 'bottom-24 right-6 w-[90vw] max-w-2xl h-[75vh] max-h-[75vh]'
@@ -122,7 +159,7 @@ export const AskAriChat = () => {
             writing — not written by the author.
           </p>
 
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+          <div aria-live="polite" className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -147,6 +184,7 @@ export const AskAriChat = () => {
 
           <form onSubmit={handleSubmit} className="flex border-t border-ink/10 p-2">
             <input
+              ref={inputRef}
               type="text"
               value={input}
               onChange={(event) => setInput(event.target.value)}
