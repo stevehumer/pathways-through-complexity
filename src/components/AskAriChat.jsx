@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactGA from 'react-ga4';
-import ariImage from '../assets/ari.png';
+import ariImage from '../assets/ari-transparent.png';
 
 const WORKER_URL = import.meta.env.VITE_ASK_ARI_WORKER_URL;
 
