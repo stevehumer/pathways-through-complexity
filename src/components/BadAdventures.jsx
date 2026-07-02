@@ -12,11 +12,7 @@ const BOOKS = [
         "We first encounter Ari as a middle manager working in an operations staff role for Azelica Technologies, a large & diversified B2B firm. He is tasked with finding effective solutions to a variety of operations challenges."
         //"Bine Ari Digit navigates the complexities of a B2B corporation, facing challenges that test his growth, leadership, and problem-solving skills as he helps drive success."
     },
-    // TODO: replace with the book's real Amazon product URL. The previous link
-    // here was Book 1's ASIN (B0CP2QHQYC, The Challenges at Azelica), so the
-    // button sold the wrong book; until the correct ASIN is known, a pinned
-    // title search is the safest destination.
-    { label: "Book 2", title: "Solutions for Sunblast", img: sunblastBookCover, link: "https://www.amazon.com/s?k=%22Solutions+for+Sunblast%22+Humer", description:
+    { label: "Book 2", title: "Solutions for Sunblast", img: sunblastBookCover, link: "https://www.amazon.com/gp/product/B0DV3P2KWP", description:
         "Radical career changes can lead to satisfying outcomes. Ari has joined Mountain Vista, a boutique consulting company. His initial client, Sunblast Innovations, will test his skills and abilities in helping them find success."
         //"Now a consultant at Mountain Vista, Ari’s first project takes him to Sunblast Innovations, where he must steer the company through strategic and operational challenges."
     },
