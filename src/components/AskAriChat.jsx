@@ -15,6 +15,56 @@ const HISTORY_MESSAGES_SENT = 12;
 
 const FALLBACK_REPLY = "Ari's taking a quick break — please try again in a bit!";
 
+// The conversation persists in localStorage so a returning visitor picks up
+// where they left off (same browser/device only; no login involved). The
+// session UUID is saved too, so the resumed chat stays one thread in the
+// transcript log.
+const STORAGE_KEY = 'ask-ari-chat';
+const STORAGE_MAX_MESSAGES = 40;
+const STORAGE_TTL_MS = 60 * 24 * 60 * 60 * 1000; // idle chats expire after 60 days
+
+function loadSavedChat() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (
+      typeof saved?.sessionId !== 'string' ||
+      !Array.isArray(saved.messages) ||
+      Date.now() - (saved.savedAt ?? 0) > STORAGE_TTL_MS
+    ) {
+      return null;
+    }
+    const messages = saved.messages.filter(
+      (m) => (m?.role === 'user' || m?.role === 'ari') && typeof m?.text === 'string',
+    );
+    return messages.length > 1 ? { sessionId: saved.sessionId, messages } : null;
+  } catch {
+    return null; // storage unavailable or corrupted: start fresh, like before
+  }
+}
+
+function saveChat(sessionId, messages) {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        sessionId,
+        messages: messages.slice(-STORAGE_MAX_MESSAGES),
+        savedAt: Date.now(),
+      }),
+    );
+  } catch {
+    // Storage unavailable (private mode etc.): chat still works, just won't persist.
+  }
+}
+
+function clearSavedChat() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
+  }
+}
+
 const TypingIndicator = () => (
   <div className="flex justify-start">
     <div className="flex items-center gap-1 rounded-lg px-3 py-3 bg-bookYellow">
@@ -38,17 +88,35 @@ const CollapseIcon = () => (
 );
 
 export const AskAriChat = () => {
+  // Restored once on mount; null when there's no (valid) saved conversation.
+  const [savedChat] = useState(loadSavedChat);
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [messages, setMessages] = useState([STARTER_MESSAGE]);
+  const [messages, setMessages] = useState(savedChat?.messages ?? [STARTER_MESSAGE]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
-  // Anonymous per-visit conversation ID, created lazily on the first message
-  // so merely opening the widget doesn't mint one. Groups the thread in the
-  // transcript log; contains no visitor identity.
-  const sessionIdRef = useRef(null);
+  // Anonymous conversation ID, created lazily on the first message so merely
+  // opening the widget doesn't mint one. Groups the thread in the transcript
+  // log; contains no visitor identity. Restored on revisit so a resumed chat
+  // stays one thread.
+  const sessionIdRef = useRef(savedChat?.sessionId ?? null);
+
+  useEffect(() => {
+    if (sessionIdRef.current && messages.length > 1) {
+      saveChat(sessionIdRef.current, messages);
+    }
+  }, [messages]);
+
+  const startNewChat = () => {
+    if (!window.confirm('Start a new chat? Your current conversation will be cleared.')) return;
+    clearSavedChat();
+    sessionIdRef.current = null;
+    setMessages([STARTER_MESSAGE]);
+    setInput('');
+    inputRef.current?.focus();
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -80,10 +148,9 @@ export const AskAriChat = () => {
       sessionIdRef.current = crypto.randomUUID();
     }
 
-    // Replay the conversation so far (minus the hardcoded greeting) so Ari
-    // can answer follow-ups in context. The worker validates and caps this.
+    // Replay the conversation so far so Ari can answer follow-ups in context.
+    // The worker validates, caps, and drops any leading assistant greeting.
     const history = messages
-      .slice(1)
       .slice(-HISTORY_MESSAGES_SENT)
       .map(({ role, text }) => ({ role, text }));
 
@@ -158,6 +225,14 @@ export const AskAriChat = () => {
               <span className="font-display font-semibold text-ink">Chat with Ari</span>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                onClick={startNewChat}
+                aria-label="Start a new chat"
+                title="Start a new chat"
+                className="text-ink/70 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold rounded text-xs font-medium underline underline-offset-2"
+              >
+                New chat
+              </button>
               <button
                 onClick={() => setIsExpanded((expanded) => !expanded)}
                 aria-label={isExpanded ? 'Collapse chat' : 'Expand chat'}
