@@ -75,49 +75,74 @@ export async function logExchange(
   return { isNewSession };
 }
 
-export interface NtfyConfig {
-  topic: string;
-  /**
-   * ntfy.sh access token (free account). Required in practice: anonymous
-   * publish quotas are per source IP, and Workers egress from shared IPs
-   * whose quota other people's Workers have usually already exhausted.
-   * With a token the quota is attributed to the account instead.
-   */
-  token?: string;
+export interface AlertConfig {
+  /** Discord incoming-webhook URL: the recommended transport. Free, and
+   * authenticated by the URL itself, so it works from Workers' shared
+   * egress IPs. */
+  discordWebhookUrl?: string;
+  /** ntfy.sh fallback. Only useful with a PAID ntfy account (or self-hosted
+   * server): ntfy keys free-tier quotas to the source IP even for
+   * authenticated publishes, and Workers egress IPs are shared and
+   * exhausted, so free ntfy 429s from here. */
+  ntfyTopic?: string;
+  ntfyToken?: string;
 }
 
-/** Push notification via ntfy.sh. */
-async function publishNtfy(
-  ntfy: NtfyConfig,
-  title: string,
-  body: string,
-  clickUrl?: string,
-): Promise<void> {
-  const headers: Record<string, string> = {
-    Title: title,
-    Tags: 'speech_balloon',
-  };
-  if (clickUrl) headers.Click = clickUrl;
-  if (ntfy.token) headers.Authorization = `Bearer ${ntfy.token}`;
-  const res = await fetch(`https://ntfy.sh/${ntfy.topic}`, { method: 'POST', headers, body });
-  if (!res.ok) {
-    console.error(`ntfy publish failed: ${res.status} ${(await res.text()).slice(0, 200)}`);
+interface Alert {
+  title: string;
+  body: string;
+  linkUrl: string;
+}
+
+async function sendAlert(config: AlertConfig, alert: Alert): Promise<void> {
+  if (config.discordWebhookUrl) {
+    const res = await fetch(config.discordWebhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: `**${alert.title}**\n${alert.body}\n${alert.linkUrl}`,
+      }),
+    });
+    if (!res.ok) {
+      console.error(`Discord alert failed: ${res.status} ${(await res.text()).slice(0, 200)}`);
+    }
+    return;
+  }
+
+  if (config.ntfyTopic) {
+    const headers: Record<string, string> = {
+      Title: alert.title,
+      Tags: 'speech_balloon',
+      Click: alert.linkUrl,
+    };
+    if (config.ntfyToken) headers.Authorization = `Bearer ${config.ntfyToken}`;
+    const res = await fetch(`https://ntfy.sh/${config.ntfyTopic}`, {
+      method: 'POST',
+      headers,
+      body: alert.body,
+    });
+    if (!res.ok) {
+      console.error(`ntfy alert failed: ${res.status} ${(await res.text()).slice(0, 200)}`);
+    }
   }
 }
 
+export function alertConfigured(config: AlertConfig): boolean {
+  return Boolean(config.discordWebhookUrl || config.ntfyTopic);
+}
+
 export async function alertNewSession(
-  ntfy: NtfyConfig,
+  config: AlertConfig,
   sessionId: string,
   meta: SessionMeta,
   firstQuestion: string,
   adminOrigin: string,
 ): Promise<void> {
-  await publishNtfy(
-    ntfy,
-    `New Ask Ari chat${meta.country ? ` (${meta.country})` : ''}`,
-    `"${firstQuestion.slice(0, 300)}"`,
-    `${adminOrigin}/admin/session/${sessionId}`,
-  );
+  await sendAlert(config, {
+    title: `New Ask Ari chat${meta.country ? ` (${meta.country})` : ''}`,
+    body: `"${firstQuestion.slice(0, 300)}"`,
+    linkUrl: `${adminOrigin}/admin/session/${sessionId}`,
+  });
 }
 
 /**
@@ -126,7 +151,7 @@ export async function alertNewSession(
  * hammering the endpoint produces one ping, not hundreds.
  */
 export async function alertRateLimited(
-  ntfy: NtfyConfig,
+  config: AlertConfig,
   kv: KVNamespace,
   meta: SessionMeta,
   adminOrigin: string,
@@ -136,10 +161,9 @@ export async function alertRateLimited(
   if (await kv.get(dedupeKey)) return;
   await kv.put(dedupeKey, '1', { expirationTtl: 60 * 60 * 24 });
 
-  await publishNtfy(
-    ntfy,
-    'Ask Ari rate limit tripped',
-    `IP ${meta.clientIp}${meta.country ? ` (${meta.country})` : ''} hit the rate limit. Possible bot traffic.`,
-    `${adminOrigin}/admin`,
-  );
+  await sendAlert(config, {
+    title: 'Ask Ari rate limit tripped',
+    body: `IP ${meta.clientIp}${meta.country ? ` (${meta.country})` : ''} hit the rate limit. Possible bot traffic.`,
+    linkUrl: `${adminOrigin}/admin`,
+  });
 }

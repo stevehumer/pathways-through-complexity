@@ -73,12 +73,14 @@ never break or slow the chat.
 - **View conversations**: `https://ask-ari.<subdomain>.workers.dev/admin` —
   session list with previews, and click-through thread views. HTTP Basic auth:
   username `admin`, password = the `ADMIN_TOKEN` secret.
-- **Alerts**: a push notification is sent via ntfy.sh when a new session
-  starts (and at most once per IP per day when the rate limit trips). Set the
-  `NTFY_TOPIC` and `NTFY_TOKEN` secrets; subscribe to the topic in the ntfy
-  app. The token requires a free ntfy.sh account — anonymous publishing is
-  quota-limited per source IP, and Workers egress IPs are shared and usually
-  exhausted.
+- **Alerts**: a push notification is sent when a new session starts (and at
+  most once per IP per day when the rate limit trips). Preferred transport:
+  Discord — set the `DISCORD_WEBHOOK_URL` secret to an incoming-webhook URL.
+  Fallback: ntfy.sh via `NTFY_TOPIC`/`NTFY_TOKEN`, but note that only works
+  with a *paid* ntfy account: ntfy keys free-tier publish quotas to the
+  source IP even for authenticated requests, and Workers egress IPs are
+  shared and their quota is always exhausted (verified empirically — 429
+  "daily message quota reached" while the account showed 248/250 remaining).
 - **Schema**: `schema.sql`; apply with
   `npx wrangler d1 execute ask-ari-logs --file schema.sql [--remote]`.
 - **Ad-hoc queries**:
