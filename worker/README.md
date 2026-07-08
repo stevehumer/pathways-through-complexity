@@ -72,7 +72,9 @@ never break or slow the chat.
 
 - **View conversations**: `https://ask-ari.<subdomain>.workers.dev/admin` —
   session list with previews, and click-through thread views. HTTP Basic auth:
-  username `admin`, password = the `ADMIN_TOKEN` secret.
+  username `admin`, password = the `ADMIN_TOKEN` secret. Each session can be
+  deleted (row button or from the thread view), and "Clear all" purges
+  everything; mutations are same-origin-guarded since Basic auth is ambient.
 - **Alerts**: a push notification is sent when a new session starts (and at
   most once per IP per day when the rate limit trips). Preferred transport:
   Discord — set the `DISCORD_WEBHOOK_URL` secret to an incoming-webhook URL.

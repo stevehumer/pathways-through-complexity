@@ -76,6 +76,10 @@ const PAGE_STYLE = `
   .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; }
   .live { background: #e8f140; }
   .spam { background: #c8842c; color: #fff; }
+  .danger { background: none; border: 1px solid #b3423a66; color: #b3423a; border-radius: 6px; padding: 3px 10px; font-size: 12px; cursor: pointer; }
+  .danger:hover { background: #b3423a; color: #fff; }
+  .toolbar { display: flex; justify-content: space-between; align-items: baseline; }
+  form.inline { display: inline; margin: 0; }
   .muted { color: #2b262080; }
   .bubble { max-width: 640px; padding: 10px 14px; border-radius: 10px; margin: 6px 0; font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
   .user { background: #2b2620; color: #fff; margin-left: auto; }
@@ -117,23 +121,40 @@ async function renderSessionList(db: D1Database): Promise<Response> {
       const spam = s.rate_limited_count > 0 ? ` <span class="badge spam">${s.rate_limited_count} rate-limited</span>` : '';
       const preview = s.first_question ? escapeHtml(s.first_question.slice(0, 90)) : '<span class="muted">—</span>';
       const ua = s.user_agent ? escapeHtml(s.user_agent.slice(0, 60)) : '—';
+      const deleteForm = `<form class="inline" method="post" action="/admin/session/${escapeHtml(s.id)}/delete"
+          onsubmit="return confirm('Delete this conversation permanently?')">
+          <button class="danger" type="submit" aria-label="Delete session">&times;</button>
+        </form>`;
       return `<tr>
         <td><a href="/admin/session/${escapeHtml(s.id)}">${formatWhen(s.started_at)}</a>${live}${spam}</td>
         <td>${s.message_count}</td>
         <td>${preview}</td>
         <td>${escapeHtml(s.country ?? '—')}<br><span class="muted">${escapeHtml(s.client_ip ?? '—')}</span></td>
         <td class="muted">${ua}</td>
+        <td>${deleteForm}</td>
       </tr>`;
     })
     .join('');
 
+  const clearAll = results.length
+    ? `<form class="inline" method="post" action="/admin/clear"
+         onsubmit="return confirm('Delete ALL ${results.length} conversation(s) permanently? This cannot be undone.')">
+         <button class="danger" type="submit">Clear all</button>
+       </form>`
+    : '';
+
   return page(
     'Ask Ari — sessions',
-    `<h1>Ask Ari — conversations</h1>
-     <div class="sub">${results.length} session(s), newest activity first. Click a session to read the thread.</div>
+    `<div class="toolbar">
+       <div>
+         <h1>Ask Ari — conversations</h1>
+         <div class="sub">${results.length} session(s), newest activity first. Click a session to read the thread.</div>
+       </div>
+       ${clearAll}
+     </div>
      <table>
-       <tr><th>Started</th><th>Msgs</th><th>First question</th><th>Where</th><th>User agent</th></tr>
-       ${rows || '<tr><td colspan="5" class="muted">No conversations yet.</td></tr>'}
+       <tr><th>Started</th><th>Msgs</th><th>First question</th><th>Where</th><th>User agent</th><th></th></tr>
+       ${rows || '<tr><td colspan="6" class="muted">No conversations yet.</td></tr>'}
      </table>`,
   );
 }
@@ -163,7 +184,13 @@ async function renderSession(db: D1Database, sessionId: string): Promise<Respons
 
   return page(
     'Ask Ari — session',
-    `<h1>Conversation</h1>
+    `<div class="toolbar">
+       <h1>Conversation</h1>
+       <form class="inline" method="post" action="/admin/session/${escapeHtml(sessionId)}/delete"
+         onsubmit="return confirm('Delete this conversation permanently?')">
+         <button class="danger" type="submit">Delete conversation</button>
+       </form>
+     </div>
      <div class="sub">
        <a href="/admin">← All sessions</a> ·
        started ${formatWhen(session.started_at)} · last activity ${formatWhen(session.last_active_at)} ·
@@ -174,6 +201,31 @@ async function renderSession(db: D1Database, sessionId: string): Promise<Respons
   );
 }
 
+/**
+ * Browsers replay Basic-auth credentials automatically, so a malicious page
+ * could POST a delete form here cross-site. Only accept mutations initiated
+ * from the dashboard's own pages.
+ */
+function isSameOriginPost(request: Request, url: URL): boolean {
+  const fetchSite = request.headers.get('Sec-Fetch-Site');
+  if (fetchSite) return fetchSite === 'same-origin';
+  return request.headers.get('Origin') === url.origin;
+}
+
+async function deleteSession(db: D1Database, sessionId: string): Promise<void> {
+  await db.batch([
+    db.prepare('DELETE FROM messages WHERE session_id = ?').bind(sessionId),
+    db.prepare('DELETE FROM sessions WHERE id = ?').bind(sessionId),
+  ]);
+}
+
+async function deleteAllSessions(db: D1Database): Promise<void> {
+  await db.batch([
+    db.prepare('DELETE FROM messages'),
+    db.prepare('DELETE FROM sessions'),
+  ]);
+}
+
 export async function handleAdmin(
   request: Request,
   db: D1Database,
@@ -182,9 +234,6 @@ export async function handleAdmin(
   if (!adminToken) {
     return new Response('Admin dashboard is not configured (missing ADMIN_TOKEN secret).', { status: 503 });
   }
-  if (request.method !== 'GET') {
-    return new Response('Method not allowed', { status: 405 });
-  }
   if (!isAuthorized(request, adminToken)) {
     return new Response('Authentication required', {
       status: 401,
@@ -192,7 +241,30 @@ export async function handleAdmin(
     });
   }
 
-  const path = new URL(request.url).pathname;
+  const url = new URL(request.url);
+  const path = url.pathname;
+  const backToList = () => Response.redirect(`${url.origin}/admin`, 303);
+
+  if (request.method === 'POST') {
+    if (!isSameOriginPost(request, url)) {
+      return new Response('Forbidden (cross-site request)', { status: 403 });
+    }
+    const deleteMatch = path.match(/^\/admin\/session\/([0-9a-z-]+)\/delete$/i);
+    if (deleteMatch) {
+      await deleteSession(db, deleteMatch[1].toLowerCase());
+      return backToList();
+    }
+    if (path === '/admin/clear') {
+      await deleteAllSessions(db);
+      return backToList();
+    }
+    return new Response('Not found', { status: 404 });
+  }
+
+  if (request.method !== 'GET') {
+    return new Response('Method not allowed', { status: 405 });
+  }
+
   const sessionMatch = path.match(/^\/admin\/session\/([0-9a-z-]+)$/i);
   if (sessionMatch) {
     return renderSession(db, sessionMatch[1].toLowerCase());
