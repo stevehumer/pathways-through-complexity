@@ -6,7 +6,7 @@ const WORKER_URL = import.meta.env.VITE_ASK_ARI_WORKER_URL;
 
 const STARTER_MESSAGE = {
   role: 'ari',
-  text: "Hi, I'm Ari! Ask me anything about the books — the characters, the plots, or what I learned along the way.",
+  text: "Hello, I'm Ari. Ask me anything about the books: the characters, the plots, or what I learned along the way.",
 };
 
 // Recent turns replayed to the worker so Ari remembers the conversation.
@@ -125,7 +125,10 @@ export const AskAriChat = () => {
   }, [messages, isOpen, isLoading]);
 
   useEffect(() => {
-    if (isOpen && !isLoading) {
+    // Auto-focus is a courtesy on desktop; on touch devices it would pop the
+    // keyboard over the freshly opened panel, so let the visitor tap first.
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (isOpen && !isLoading && finePointer) {
       inputRef.current?.focus();
     }
   }, [isOpen, isLoading]);
@@ -287,7 +290,7 @@ export const AskAriChat = () => {
               placeholder="Ask Ari a question!"
               maxLength={500}
               disabled={isLoading}
-              className="flex-1 min-w-0 bg-white rounded border border-ink/15 focus:border-gold focus:ring-2 focus:ring-gold/30 text-sm outline-none text-ink py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+              className="flex-1 min-w-0 bg-white rounded border border-ink/15 focus:border-gold focus:ring-2 focus:ring-gold/30 text-base outline-none text-ink py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             />
             <button
               type="submit"

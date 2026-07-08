@@ -82,6 +82,19 @@ whole knowledge base every time.
 
 ## Model & response settings (`src/index.ts`)
 
+- Register (tuned 2026-07-08 from the author's feedback that Ari read "a
+  bit more casual than expected"): the prompt now anchors to the novels'
+  narration voice, "slightly formal, thoughtful, reflective, understated,
+  wry", bans chatty interjections ("Ha,", "Hey there,", "friend", emoji)
+  and (almost all) exclamation marks, and keeps humor deadpan. The earlier
+  "write like a real person typing a quick reply / informal is fine"
+  guidance was the culprit and is gone. Default reply length is two to
+  four sentences (most visitors read on phones).
+- Extended thinking is explicitly disabled in the API call: Sonnet 5
+  sometimes spent adaptive-thinking tokens inside `max_tokens`, which
+  truncated mid-word (or fully consumed) the visible reply on questions
+  that triggered long thinking. Empty replies now fail over to the
+  in-character error message instead of an empty bubble.
 - Model: `claude-sonnet-5`, set via the `MODEL` var in `wrangler.toml`
   (falls back to the same default in code). Upgraded from
   `claude-haiku-4-5` because Sonnet holds Ari's voice and the

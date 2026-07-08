@@ -218,6 +218,11 @@ export default {
       const response = await anthropic.messages.create({
         model: env.MODEL?.trim() || DEFAULT_MODEL,
         max_tokens: MAX_RESPONSE_TOKENS,
+        // Explicitly off: Sonnet 5 sometimes spends adaptive-thinking tokens
+        // inside max_tokens, which truncated (or fully consumed) the visible
+        // reply on questions that triggered long thinking. Character chat
+        // doesn't need extended reasoning.
+        thinking: { type: 'disabled' },
         system: [
           {
             type: 'text',
@@ -230,6 +235,15 @@ export default {
 
       const textBlock = response.content.find((block) => block.type === 'text');
       const reply = textBlock?.type === 'text' ? textBlock.text : '';
+
+      if (!reply) {
+        // Never hand the widget an empty bubble.
+        console.error(`Empty reply from model (stop_reason=${response.stop_reason})`);
+        throw new Error('empty model reply');
+      }
+      if (response.stop_reason === 'max_tokens') {
+        console.warn('Reply truncated at max_tokens');
+      }
 
       ctx.waitUntil(
         captureExchange(env, adminOrigin, sessionId, meta, [
