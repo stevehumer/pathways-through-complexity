@@ -20,9 +20,16 @@ async function incrementCounter(
   return count;
 }
 
+// When blocked, we still transcript-log the first few over-limit attempts
+// (useful spam samples) but not an unbounded stream of them, so a bot
+// hammering the endpoint can't rack up database writes.
+const BLOCKED_LOG_SAMPLE = 10;
+
 export interface RateLimitResult {
   allowed: boolean;
   reason?: 'per_ip' | 'global';
+  /** Whether this request should be written to the transcript log. */
+  logSample: boolean;
 }
 
 export async function checkRateLimit(
@@ -33,15 +40,23 @@ export async function checkRateLimit(
   const perIpKey = `ip:${clientIp}:${windowBucket}`;
   const perIpCount = await incrementCounter(kv, perIpKey, PER_IP_WINDOW_SECONDS);
   if (perIpCount > PER_IP_LIMIT) {
-    return { allowed: false, reason: 'per_ip' };
+    return {
+      allowed: false,
+      reason: 'per_ip',
+      logSample: perIpCount <= PER_IP_LIMIT + BLOCKED_LOG_SAMPLE,
+    };
   }
 
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD, UTC
   const globalKey = `global:${today}`;
   const globalCount = await incrementCounter(kv, globalKey, 60 * 60 * 24);
   if (globalCount > GLOBAL_DAILY_LIMIT) {
-    return { allowed: false, reason: 'global' };
+    return {
+      allowed: false,
+      reason: 'global',
+      logSample: globalCount <= GLOBAL_DAILY_LIMIT + BLOCKED_LOG_SAMPLE,
+    };
   }
 
-  return { allowed: true };
+  return { allowed: true, logSample: true };
 }

@@ -23,3 +23,12 @@ MODEL = "claude-sonnet-5"
 [[kv_namespaces]]
 binding = "RATE_LIMIT"
 id = "b84bdd9854e54ff5987c3d8e4582d20d"
+
+# Chat transcript log (sessions + messages), viewable at /admin.
+# Schema lives in schema.sql; apply with:
+#   npx wrangler d1 execute ask-ari-logs --file schema.sql          (local dev)
+#   npx wrangler d1 execute ask-ari-logs --file schema.sql --remote (production)
+[[d1_databases]]
+binding = "DB"
+database_name = "ask-ari-logs"
+database_id = "48e15f55-eeac-47c6-b5d8-03749caa971d"

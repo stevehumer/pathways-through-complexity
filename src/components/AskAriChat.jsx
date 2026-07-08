@@ -45,6 +45,10 @@ export const AskAriChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+  // Anonymous per-visit conversation ID, created lazily on the first message
+  // so merely opening the widget doesn't mint one. Groups the thread in the
+  // transcript log; contains no visitor identity.
+  const sessionIdRef = useRef(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -72,6 +76,10 @@ export const AskAriChat = () => {
     const question = input.trim();
     if (!question || isLoading) return;
 
+    if (!sessionIdRef.current) {
+      sessionIdRef.current = crypto.randomUUID();
+    }
+
     // Replay the conversation so far (minus the hardcoded greeting) so Ari
     // can answer follow-ups in context. The worker validates and caps this.
     const history = messages
@@ -90,7 +98,11 @@ export const AskAriChat = () => {
       const res = await fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: question, history }),
+        body: JSON.stringify({
+          message: question,
+          history,
+          sessionId: sessionIdRef.current,
+        }),
       });
       const data = await res.json().catch(() => null);
 
@@ -165,7 +177,7 @@ export const AskAriChat = () => {
 
           <p className="px-4 pt-2 pb-1 text-xs text-ink/60 italic border-b border-ink/10">
             Ari&apos;s replies are AI-generated, inspired by the books&apos; characters and
-            writing — not written by the author.
+            writing — not written by the author. Chats may be reviewed to improve Ari.
           </p>
 
           <div aria-live="polite" className="flex-1 overflow-y-auto px-4 py-3 space-y-3">

@@ -1,3 +1,12 @@
 # Copy to .dev.vars (gitignored) for local `wrangler dev`.
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ALLOWED_ORIGINS=http://localhost:5173,https://pathwaysthroughcomplexity.com
+
+# Optional: Basic-auth password for the /admin transcript dashboard.
+ADMIN_TOKEN=pick_a_long_random_string
+
+# Optional: ntfy.sh alerts for new chat sessions. The token comes from a free
+# ntfy.sh account; without it, publishes from Workers shared egress IPs are
+# usually quota-blocked (429).
+NTFY_TOPIC=your-secret-topic-name
+NTFY_TOKEN=tk_your_ntfy_access_token

@@ -1,12 +1,25 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { buildSystemPrompt } from './systemPrompt';
 import { checkRateLimit } from './rateLimit';
+import {
+  alertNewSession,
+  alertRateLimited,
+  logExchange,
+  resolveSessionId,
+  type SessionMeta,
+  type LoggedMessage,
+} from './chatLog';
+import { handleAdmin } from './admin';
 
 export interface Env {
   ANTHROPIC_API_KEY: string;
   ALLOWED_ORIGINS: string; // comma-separated
   MODEL?: string; // set in wrangler.toml [vars]; falls back to DEFAULT_MODEL
+  ADMIN_TOKEN?: string; // secret: Basic-auth password for /admin
+  NTFY_TOPIC?: string; // secret: ntfy.sh topic for admin alerts; unset = no alerts
+  NTFY_TOKEN?: string; // secret: ntfy.sh access token (see chatLog.ts NtfyConfig)
   RATE_LIMIT: KVNamespace;
+  DB: D1Database;
 }
 
 const DEFAULT_MODEL = 'claude-sonnet-5';
@@ -78,8 +91,41 @@ function json(body: unknown, status: number, headers: HeadersInit): Response {
   });
 }
 
+/**
+ * Transcript logging + alerting, run via ctx.waitUntil after the response is
+ * already on its way. Failures are logged and swallowed: capture must never
+ * break the chat.
+ */
+async function captureExchange(
+  env: Env,
+  adminOrigin: string,
+  sessionId: string,
+  meta: SessionMeta,
+  rows: LoggedMessage[],
+): Promise<void> {
+  try {
+    const { isNewSession } = await logExchange(env.DB, sessionId, meta, rows);
+    if (env.NTFY_TOPIC) {
+      const ntfy = { topic: env.NTFY_TOPIC, token: env.NTFY_TOKEN };
+      if (isNewSession) {
+        await alertNewSession(ntfy, sessionId, meta, rows[0].content, adminOrigin);
+      }
+      if (rows.some((row) => row.status === 'rate_limited')) {
+        await alertRateLimited(ntfy, env.RATE_LIMIT, meta, adminOrigin);
+      }
+    }
+  } catch (err) {
+    console.error('Transcript capture failed:', err);
+  }
+}
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+    if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+      return handleAdmin(request, env.DB, env.ADMIN_TOKEN);
+    }
+
     const origin = request.headers.get('Origin');
     const headers = corsHeaders(origin, env);
 
@@ -105,13 +151,16 @@ export default {
 
     let message: unknown;
     let rawHistory: unknown;
+    let rawSessionId: unknown;
     try {
       const bodyData = (await request.json()) as {
         message?: unknown;
         history?: unknown;
+        sessionId?: unknown;
       };
       message = bodyData.message;
       rawHistory = bodyData.history;
+      rawSessionId = bodyData.sessionId;
     } catch {
       return json({ error: 'Invalid JSON body' }, 400, headers);
     }
@@ -129,8 +178,23 @@ export default {
     }
 
     const clientIp = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+    const sessionId = resolveSessionId(rawSessionId);
+    const meta: SessionMeta = {
+      clientIp,
+      country: (request.cf?.country as string | undefined) ?? null,
+      userAgent: request.headers.get('User-Agent'),
+    };
+    const adminOrigin = url.origin;
+
     const rateLimit = await checkRateLimit(env.RATE_LIMIT, clientIp);
     if (!rateLimit.allowed) {
+      if (rateLimit.logSample) {
+        ctx.waitUntil(
+          captureExchange(env, adminOrigin, sessionId, meta, [
+            { role: 'user', content: trimmedMessage, status: 'rate_limited' },
+          ]),
+        );
+      }
       const reply =
         rateLimit.reason === 'global'
           ? "Whoa, Ari's gotten a lot of mail today — try again tomorrow!"
@@ -161,9 +225,21 @@ export default {
       const textBlock = response.content.find((block) => block.type === 'text');
       const reply = textBlock?.type === 'text' ? textBlock.text : '';
 
+      ctx.waitUntil(
+        captureExchange(env, adminOrigin, sessionId, meta, [
+          { role: 'user', content: trimmedMessage, status: 'ok' },
+          { role: 'ari', content: reply, status: 'ok' },
+        ]),
+      );
+
       return json({ reply }, 200, headers);
     } catch (err) {
       console.error('Anthropic API error:', err);
+      ctx.waitUntil(
+        captureExchange(env, adminOrigin, sessionId, meta, [
+          { role: 'user', content: trimmedMessage, status: 'upstream_error' },
+        ]),
+      );
       return json(
         { error: "Ari's having a moment — please try again shortly." },
         502,

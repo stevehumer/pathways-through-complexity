@@ -60,3 +60,28 @@ that in the frontend's `VITE_ASK_ARI_WORKER_URL` env var.
   base. The persona and knowledge sections are placeholders pending the real
   content from the author (see the main plan/conversation) — guardrails are
   final.
+
+## Chat transcripts, admin dashboard, and alerts
+
+Every conversation is captured in a D1 database (`ask-ari-logs`): one
+`sessions` row per visitor thread (anonymous per-visit UUID from the widget,
+plus IP / country / user-agent as bot-spam signals) and one `messages` row per
+turn, including rate-limited and errored attempts. Capture runs after the
+response is sent (`ctx.waitUntil`) and swallows its own failures, so it can
+never break or slow the chat.
+
+- **View conversations**: `https://ask-ari.<subdomain>.workers.dev/admin` —
+  session list with previews, and click-through thread views. HTTP Basic auth:
+  username `admin`, password = the `ADMIN_TOKEN` secret.
+- **Alerts**: a push notification is sent via ntfy.sh when a new session
+  starts (and at most once per IP per day when the rate limit trips). Set the
+  `NTFY_TOPIC` and `NTFY_TOKEN` secrets; subscribe to the topic in the ntfy
+  app. The token requires a free ntfy.sh account — anonymous publishing is
+  quota-limited per source IP, and Workers egress IPs are shared and usually
+  exhausted.
+- **Schema**: `schema.sql`; apply with
+  `npx wrangler d1 execute ask-ari-logs --file schema.sql [--remote]`.
+- **Ad-hoc queries**:
+  `npx wrangler d1 execute ask-ari-logs --remote --command "SELECT ..."`.
+
+New pieces: `src/chatLog.ts` (capture + alerts), `src/admin.ts` (dashboard).
