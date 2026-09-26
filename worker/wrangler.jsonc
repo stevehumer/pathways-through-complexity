@@ -1,0 +1,51 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "ask-ari",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-26",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Workers Logs + traces (dashboard → Workers → ask-ari → Observability).
+  // Low traffic, so sample everything.
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 1 }
+  },
+
+  // Which Claude model answers as Ari. Swap without a code change; redeploy
+  // (npm run deploy) to apply. Haiku (claude-haiku-4-5) is the budget option;
+  // Sonnet holds Ari's voice and the writing-style rules noticeably better.
+  "vars": {
+    "MODEL": "claude-sonnet-5"
+  },
+
+  // Secrets: set with `npx wrangler secret put <NAME>`, never committed; for
+  // local dev put them in .dev.vars (see .dev.vars.example). Listing them here
+  // drives `wrangler types` and warns in `wrangler dev` when one is missing.
+  //   ANTHROPIC_API_KEY   — Claude API key
+  //   ALLOWED_ORIGINS     — comma-separated origins allowed to call this Worker
+  //   ADMIN_TOKEN         — Basic-auth password for /admin (dashboard 503s without it)
+  //   DISCORD_WEBHOOK_URL — new-chat / rate-limit alerts (skipped when unset)
+  "secrets": {
+    "required": ["ANTHROPIC_API_KEY", "ALLOWED_ORIGINS", "ADMIN_TOKEN", "DISCORD_WEBHOOK_URL"]
+  },
+
+  // Rate-limit + circuit-breaker counters. Created once with:
+  //   npx wrangler kv namespace create RATE_LIMIT --binding RATE_LIMIT --update-config
+  "kv_namespaces": [
+    { "binding": "RATE_LIMIT", "id": "b84bdd9854e54ff5987c3d8e4582d20d" }
+  ],
+
+  // Chat transcript log (sessions + messages), viewable at /admin.
+  // Schema lives in schema.sql; apply with:
+  //   npx wrangler d1 execute ask-ari-logs --file schema.sql          (local dev)
+  //   npx wrangler d1 execute ask-ari-logs --file schema.sql --remote (production)
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ask-ari-logs",
+      "database_id": "48e15f55-eeac-47c6-b5d8-03749caa971d"
+    }
+  ]
+}

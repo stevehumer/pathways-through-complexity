@@ -12,17 +12,7 @@ import {
 } from './chatLog';
 import { handleAdmin } from './admin';
 
-export interface Env {
-  ANTHROPIC_API_KEY: string;
-  ALLOWED_ORIGINS: string; // comma-separated
-  MODEL?: string; // set in wrangler.toml [vars]; falls back to DEFAULT_MODEL
-  ADMIN_TOKEN?: string; // secret: Basic-auth password for /admin
-  DISCORD_WEBHOOK_URL?: string; // secret: preferred alert transport (see chatLog.ts AlertConfig)
-  NTFY_TOPIC?: string; // secret: ntfy.sh fallback; needs a paid ntfy account (see AlertConfig)
-  NTFY_TOKEN?: string; // secret: ntfy.sh access token
-  RATE_LIMIT: KVNamespace;
-  DB: D1Database;
-}
+// `Env` is generated from wrangler.jsonc by `npm run types` (worker-configuration.d.ts).
 
 const DEFAULT_MODEL = 'claude-sonnet-5';
 const MAX_INPUT_CHARS = 500;
@@ -107,11 +97,7 @@ async function captureExchange(
 ): Promise<void> {
   try {
     const { isNewSession } = await logExchange(env.DB, sessionId, meta, rows);
-    const alerts = {
-      discordWebhookUrl: env.DISCORD_WEBHOOK_URL,
-      ntfyTopic: env.NTFY_TOPIC,
-      ntfyToken: env.NTFY_TOKEN,
-    };
+    const alerts = { discordWebhookUrl: env.DISCORD_WEBHOOK_URL };
     if (alertConfigured(alerts)) {
       if (isNewSession) {
         await alertNewSession(alerts, sessionId, meta, rows[0].content, adminOrigin);
@@ -267,4 +253,4 @@ export default {
       );
     }
   },
-};
+} satisfies ExportedHandler<Env>;

@@ -5,11 +5,6 @@ ALLOWED_ORIGINS=http://localhost:5173,https://pathwaysthroughcomplexity.com
 # Optional: Basic-auth password for the /admin transcript dashboard.
 ADMIN_TOKEN=pick_a_long_random_string
 
-# Optional: alerts for new chat sessions. Discord webhook is the recommended
-# transport (free; the URL itself is the credential, so it works from Workers
-# shared egress IPs). ntfy.sh is a fallback that only works with a PAID ntfy
-# account: free-tier quotas are keyed to the source IP even when
-# authenticated, and Workers egress IPs are shared and exhausted.
+# Optional: Discord incoming-webhook URL for new-chat and rate-limit alerts
+# (free; the URL itself is the credential).
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
-NTFY_TOPIC=your-secret-topic-name
-NTFY_TOKEN=tk_your_ntfy_access_token

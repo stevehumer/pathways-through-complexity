@@ -80,12 +80,6 @@ export interface AlertConfig {
    * authenticated by the URL itself, so it works from Workers' shared
    * egress IPs. */
   discordWebhookUrl?: string;
-  /** ntfy.sh fallback. Only useful with a PAID ntfy account (or self-hosted
-   * server): ntfy keys free-tier quotas to the source IP even for
-   * authenticated publishes, and Workers egress IPs are shared and
-   * exhausted, so free ntfy 429s from here. */
-  ntfyTopic?: string;
-  ntfyToken?: string;
 }
 
 interface Alert {
@@ -95,40 +89,21 @@ interface Alert {
 }
 
 async function sendAlert(config: AlertConfig, alert: Alert): Promise<void> {
-  if (config.discordWebhookUrl) {
-    const res = await fetch(config.discordWebhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: `**${alert.title}**\n${alert.body}\n${alert.linkUrl}`,
-      }),
-    });
-    if (!res.ok) {
-      console.error(`Discord alert failed: ${res.status} ${(await res.text()).slice(0, 200)}`);
-    }
-    return;
-  }
-
-  if (config.ntfyTopic) {
-    const headers: Record<string, string> = {
-      Title: alert.title,
-      Tags: 'speech_balloon',
-      Click: alert.linkUrl,
-    };
-    if (config.ntfyToken) headers.Authorization = `Bearer ${config.ntfyToken}`;
-    const res = await fetch(`https://ntfy.sh/${config.ntfyTopic}`, {
-      method: 'POST',
-      headers,
-      body: alert.body,
-    });
-    if (!res.ok) {
-      console.error(`ntfy alert failed: ${res.status} ${(await res.text()).slice(0, 200)}`);
-    }
+  if (!config.discordWebhookUrl) return;
+  const res = await fetch(config.discordWebhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      content: `**${alert.title}**\n${alert.body}\n${alert.linkUrl}`,
+    }),
+  });
+  if (!res.ok) {
+    console.error(`Discord alert failed: ${res.status} ${(await res.text()).slice(0, 200)}`);
   }
 }
 
 export function alertConfigured(config: AlertConfig): boolean {
-  return Boolean(config.discordWebhookUrl || config.ntfyTopic);
+  return Boolean(config.discordWebhookUrl);
 }
 
 export async function alertNewSession(

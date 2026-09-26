@@ -13,7 +13,7 @@ npm install
 npx wrangler login
 
 # Creates the KV namespace used for rate limiting and writes its id into
-# wrangler.toml automatically.
+# wrangler.jsonc automatically.
 npx wrangler kv namespace create RATE_LIMIT --binding RATE_LIMIT --update-config
 
 # Stores your Anthropic key as an encrypted Worker secret (prompts for the value).
@@ -78,11 +78,8 @@ never break or slow the chat.
 - **Alerts**: a push notification is sent when a new session starts (and at
   most once per IP per day when the rate limit trips). Preferred transport:
   Discord — set the `DISCORD_WEBHOOK_URL` secret to an incoming-webhook URL.
-  Fallback: ntfy.sh via `NTFY_TOPIC`/`NTFY_TOKEN`, but note that only works
-  with a *paid* ntfy account: ntfy keys free-tier publish quotas to the
-  source IP even for authenticated requests, and Workers egress IPs are
-  shared and their quota is always exhausted (verified empirically — 429
-  "daily message quota reached" while the account showed 248/250 remaining).
+  (ntfy.sh was tried and removed: its free tier keys publish quotas to the
+  source IP, and Workers' shared egress IPs always have that quota exhausted.)
 - **Schema**: `schema.sql`; apply with
   `npx wrangler d1 execute ask-ari-logs --file schema.sql [--remote]`.
 - **Ad-hoc queries**:
